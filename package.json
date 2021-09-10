@@ -1,0 +1,37 @@
+{
+  "name": "Advanced_Authorization",
+  "version": "1.0.0",
+  "description": "Advanced Level Authorization",
+  "main": "server.js",
+  "scripts": {
+    "start": "rm -rf dist && yarn run build && node dist/server.js",
+    "dev": "ts-node-dev src/server.ts",
+    "build": "tsc -p .",
+    "data:import": "ts-node-dev src/seeker.ts",
+    "data:destroy": "ts-node-dev src/seeker.ts -d"
+  },
+  "author": "GokulSreejith <gokulsreejith22002@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "bcryptjs": "^2.4.3",
+    "colors": "^1.4.0",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "google-auth-library": "^7.9.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.1.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/cookie-parser": "^1.4.2",
+    "@types/cors": "^2.8.12",
+    "@types/jsonwebtoken": "^8.5.5",
+    "@types/qrcode": "^1.4.1",
+    "@types/speakeasy": "^2.0.6",
+    "qrcode": "^1.4.4",
+    "speakeasy": "^2.0.0"
+  }
+}
