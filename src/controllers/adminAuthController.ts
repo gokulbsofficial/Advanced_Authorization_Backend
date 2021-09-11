@@ -34,6 +34,23 @@ export const adminLogin: ApiParams = (req, res, next) => {
 };
 
 /**
+ * @method POST
+ * @access PUBLIC
+ * @description Add new admin account
+ */
+ export const addAdmin: ApiParams = (req, res, next) => {
+  const { name, email } = req.body;
+  // authHelper
+  //   .doSignup(name, email, password)
+  //   .then((response: IAuthResponse) => {
+  //     res.status(200).json({ success: true, message: response.message });
+  //   })
+  //   .catch((error: IErrorResponse) => {
+  //     return next(new ErrorResponse(error.message, 402, error.code));
+  //   });
+};
+
+/**
  * @method GET
  * @access PUBLIC
  * @description Update cookie tokens

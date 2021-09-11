@@ -11,6 +11,7 @@ const router = express.Router();
 
 /* ADMIN Auth Routes starts with /api/v1/auth/admin/* */
 router.route("/login").post(adminLogin);
+router.route("/add-admin").post(adminLogin);
 router.route("/new-access-token").get(newAccessToken);
 
 router.route("/generate-authenticator").get(verifyAdmin, generateAuthenticator);

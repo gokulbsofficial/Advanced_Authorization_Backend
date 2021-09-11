@@ -36,7 +36,7 @@ app.use(
 );
 
 /* MONGO connection */
-db.connect(async (err: AnyError) => {
+db.connect((err: AnyError) => {
   if (err) {
     logger.error(NAMESPACE, err.message, err);
   } else {

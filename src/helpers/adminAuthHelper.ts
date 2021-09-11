@@ -105,7 +105,7 @@ export const adminLogin = (email: string, password: string) => {
 export const addAdmin = (name: string, email: string, mobile: number) => {
   return new Promise<IAuthResponse>(async (resolve, reject) => {
     if (!name || !email || !mobile)
-      return reject({ message: "Please Provide Name And Email" });
+      return reject({ message: "Please Provide Name, Email and Mobile" });
     try {
       const adminFound = await db
         .get()
@@ -150,7 +150,7 @@ export const addAdmin = (name: string, email: string, mobile: number) => {
         console.log(activationToken);
 
         // await sendMail({ to: email, name: name, link: URL }, "Activate");
-        return resolve({ message: `Activation token send to ${email}` });
+        return resolve({ message: `Admin added Successfully` });
       }
     } catch (error: any) {
       reject({
@@ -164,13 +164,36 @@ export const addAdmin = (name: string, email: string, mobile: number) => {
 /**
  * @description
  */
-export const viewAdmins = () => {
+export const getAllAdmins = () => {
   return new Promise<any>(async (resolve, reject) => {
     try {
       const adminFound = await db
         .get()
         ?.collection(collections.ADMIN)
-        .find()
+        .aggregate([
+          {
+            $match: {
+              role: "ADMIN",
+            },
+          },
+          {
+            $project: {
+              name: 1,
+              email: 1,
+              status: "$accountStatus.status",
+              blockedCount: "$accountStatus.blockedCount",
+              blockedType: "$accountStatus.blockedType",
+              blockedUntil: "$accountStatus.blockedUntil",
+              blockedReasons: "$accountStatus.blockedreason",
+              createdAt: "$accountLogs.createdAt",
+            },
+          },
+          {
+            $sort: {
+              createdAt: 1,
+            },
+          },
+        ])
         .toArray();
 
       if (adminFound && adminFound.length > 0) {
@@ -190,14 +213,32 @@ export const viewAdmins = () => {
 /**
  * @description
  */
-export const viewUsers = () => {
+export const getAllUsers = () => {
   return new Promise<any>(async (resolve, reject) => {
     try {
       const userFound = await db
         .get()
         ?.collection(collections.USER)
-        .find({ name: 1, email: 1, accountStatus: 1 });
-
+        .aggregate([
+          {
+            $project: {
+              name: 1,
+              email: 1,
+              status: "$accountStatus.status",
+              blockedCount: "$accountStatus.blockedCount",
+              blockedType: "$accountStatus.blockedType",
+              blockedUntil: "$accountStatus.blockedUntil",
+              blockedReasons: "$accountStatus.blockedreason",
+              createdAt: "$accountLogs.createdAt",
+            },
+          },
+          {
+            $sort: {
+              createdAt: 1,
+            },
+          },
+        ])
+        .toArray();
       if (userFound) {
         return resolve(userFound);
       } else {
@@ -526,26 +567,29 @@ export const generateAuthenticator = (adminId: AdminId) => {
 
       if (adminFound && adminFound.accountDetails.authenticator.enable) {
         return reject({ message: "Authenticator Already Enabled" });
-      } else if (adminFound && !adminFound.accountDetails.authenticator.enable){
-      const { secret, QRCodeURL } = await generateSpeakeasy();
+      } else if (
+        adminFound &&
+        !adminFound.accountDetails.authenticator.enable
+      ) {
+        const { secret, QRCodeURL } = await generateSpeakeasy();
 
-      await db
-        .get()
-        ?.collection(collections.ADMIN)
-        .updateOne(
-          { _id: new ObjectId(adminId) },
-          {
-            $set: {
-              accountDetails: {
-                authenticator: {
-                  temp_secret: secret,
+        await db
+          .get()
+          ?.collection(collections.ADMIN)
+          .updateOne(
+            { _id: new ObjectId(adminId) },
+            {
+              $set: {
+                accountDetails: {
+                  authenticator: {
+                    temp_secret: secret,
+                  },
                 },
               },
-            },
-          }
-        );
+            }
+          );
         resolve({ secret: secret.base32, QRCodeURL });
-        } else {
+      } else {
         reject({ message: "Incorrect Credentials" });
       }
     } catch (error: any) {
@@ -671,7 +715,7 @@ export const validateAuthenticator = (adminId: AdminId, token: string) => {
 /**
  * @description
  */
- export const disableAuthenticator = (adminId: AdminId) => {
+export const disableAuthenticator = (adminId: AdminId) => {
   return new Promise<IAuthResponse>(async (resolve, reject) => {
     if (!adminId) return reject({ message: "Please Provide AdminId" });
     try {
@@ -716,4 +760,3 @@ export const validateAuthenticator = (adminId: AdminId, token: string) => {
     }
   });
 };
-

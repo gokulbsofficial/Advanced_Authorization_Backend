@@ -231,7 +231,7 @@ export const unLinkFacebook: ApiParams = (req, res, next) => {
  * @access PUBLIC
  * @description Find a user and sent reset token in mail
  */
-export const fogetassword: ApiParams = (req, res, next) => {
+export const forgetPassword: ApiParams = (req, res, next) => {
   const email: string = req.body.email;
   authHelper
     .forgotPassword(email)
